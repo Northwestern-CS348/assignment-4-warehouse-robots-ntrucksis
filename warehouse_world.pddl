@@ -1,4 +1,4 @@
-(define (domain warehouse)
+﻿(define (domain warehouse)
 	(:requirements :typing)
 	(:types robot pallette - bigobject
         	location shipment order saleitem)
@@ -30,5 +30,17 @@
       :precondition (and (unstarted ?s) (not (complete ?s)) (ships ?s ?o) (available ?l) (packing-location ?l))
       :effect (and (started ?s) (packing-at ?s ?l) (not (unstarted ?s)) (not (available ?l)))
    )
+   (:action robotMove
+      :parameters (?r - robot ?lA - location ?lB - location)
+      :precondition (and (at ?r ?lA) (free ?r) (no-robot ?lB) (connected ?lA ?lB))
+      :effect (and (no-robot ?lA) (not (at ?r ?lA)) (at ?r ?lB) (not (no-robot ?lB)))
+   )
+
+   (:action robotMoveWithPallette
+      :parameters (?r - robot ?p - pallette ?lA - location ?lB - location)
+      :precondition (and (at ?r ?lA) (at ?p ?lA) (free ?r) (no-robot ?lB) (no-pallette ?lB) (connected ?lA ?lB))
+      :effect (and (no-robot ?lA) (no-pallette ?lA) (not (at ?r ?lA)) (not (at ?p ?lA)) (at ?r ?lB) (at ?p ?lB) (not (no-robot ?lB)) (not (no-pallette ?lB)) (connected ?lA ?lB))
+   )
+
 
 )
