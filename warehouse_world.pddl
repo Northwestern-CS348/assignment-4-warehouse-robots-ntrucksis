@@ -24,23 +24,33 @@
 
     	(contains ?p - pallette ?si - saleitem)
   )
-
    (:action startShipment
       :parameters (?s - shipment ?o - order ?l - location)
       :precondition (and (unstarted ?s) (not (complete ?s)) (ships ?s ?o) (available ?l) (packing-location ?l))
       :effect (and (started ?s) (packing-at ?s ?l) (not (unstarted ?s)) (not (available ?l)))
    )
+   
    (:action robotMove
-      :parameters (?r - robot ?lA - location ?lB - location)
-      :precondition (and (at ?r ?lA) (free ?r) (no-robot ?lB) (connected ?lA ?lB))
-      :effect (and (no-robot ?lA) (not (at ?r ?lA)) (at ?r ?lB) (not (no-robot ?lB)))
+      :parameters (?r - robot ?ls - location ?le - location)
+      :precondition (and (at ?r ?ls) (free ?r) (no-robot ?le) (connected ?ls ?le))
+      :effect (and (no-robot ?ls) (not (at ?r ?ls)) (at ?r ?le) (not (no-robot ?le)))
    )
 
    (:action robotMoveWithPallette
-      :parameters (?r - robot ?p - pallette ?lA - location ?lB - location)
-      :precondition (and (at ?r ?lA) (at ?p ?lA) (free ?r) (no-robot ?lB) (no-pallette ?lB) (connected ?lA ?lB))
-      :effect (and (no-robot ?lA) (no-pallette ?lA) (not (at ?r ?lA)) (not (at ?p ?lA)) (at ?r ?lB) (at ?p ?lB) (not (no-robot ?lB)) (not (no-pallette ?lB)) (connected ?lA ?lB))
+      :parameters (?r - robot ?p - pallette ?ls - location ?le - location)
+      :precondition (and (at ?r ?ls) (at ?p ?ls) (free ?r) (no-robot ?le) (no-pallette ?le) (connected ?ls ?le))
+      :effect (and (no-robot ?ls) (no-pallette ?ls) (not (at ?r ?ls)) (not (at ?p ?ls)) (at ?r ?le) (at ?p ?le) (not (no-robot ?le)) (not (no-pallette ?le)) (connected ?ls ?le))
    )
-
-
+   
+   (:action moveItemFromPallette
+	  :parameters (?l - location ?p - pallette ?si - saleitem ?s - shipment ?o - order)
+	  :precondition (and (started ?s) (at ?p ?l) (packing-at ?s ?l) (packing-location ?l) (contains ?p ?si) (ships ?s ?o) (orders ?o ?si))
+	  :effect (and (not (contains ?p ?si)) (includes ?s ?si))
+   )
+   
+   (:action completeShipment
+	:parameters (?s - shipment ?l - location ?o - order)
+	:precondition (and (started ?s) (not (complete ?s)) (ships ?s ?o) (not (available ?l)) (packing-location ?l))
+	:effect (and (not (started ?s)) (complete ?s) (not (packing-at ?s ?l)) (available ?l))
+   )  
 )
